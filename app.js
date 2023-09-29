@@ -9,6 +9,9 @@ dotenv.config(); // J'utilise la méthode config de dotenv pour connecter mon fi
 const homeRoutes = require('./routes/home');
 const contactRoutes = require('./routes/contact');
 const errorRoutes = require('./routes/error');
+const usersRoutes = require('./routes/user');
+const adminRoutes = require('./routes/admin');
+const signRoutes = require('./routes/sign');
 
 app.use(express.json());
 
@@ -31,6 +34,9 @@ app.use(morgan('dev'));
 
 app.use(homeRoutes);
 app.use(contactRoutes);
+app.use(adminRoutes);
+app.use(usersRoutes);
+app.use(signRoutes);
 app.use(errorRoutes);
 
 // J'écoute les informations émis par mon application (app) avec la méthode listen, sans cette méthode le serveur ne peut fonctionner

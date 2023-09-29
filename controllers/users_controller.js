@@ -1,6 +1,7 @@
 const AddressUser = require('../models/AddressUser');
 const User = require('../models/User');
 const { body, validationResult } = require('express-validator');
+const path = require('path');
 
 const verifInputs = (req, res) => {
     body('lastname', 'Le nom est obligatoire').isString().notEmpty();
@@ -58,6 +59,10 @@ const newUser = async (idAddress, req, res) => {
     })
 }
 
+exports.addUser = (req, res) => {
+    res.status(200).render(path.join(__dirname, '../views/management/users/create-user.ejs'))
+}
+
 exports.createUser = (req, res) => {
     try {
         verifInputs(req, res);
@@ -98,9 +103,19 @@ exports.createUser = (req, res) => {
     }
 }
 
-exports.getUsers = () => {}
+exports.getUsers = (req, res) => {
+    res.status(200).render(path.join(__dirname, '../views/management/users/list-users.ejs'))
+}
 exports.getUserById = () => {}
+
+exports.modifyUser = (req, res) => {
+    res.status(200).render(path.join(__dirname, '../views/management/users/update-user.ejs'))
+}
 exports.updateUser = () => {}
+
+exports.removeUser = (req, res) => {
+    res.status(200).render(path.join(__dirname, '../views/management/users/delete-user.ejs'))
+}
 exports.deleteUser = () => {}
 
 // équivaut à
