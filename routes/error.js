@@ -1,3 +1,4 @@
+// J'importe les modules dont j'aurai besoin
 const express = require('express');
 const path = require('path');
 const router = express.Router();
@@ -7,8 +8,9 @@ const router = express.Router();
 router.use((req, res) => {
     // Je traite la réponse à envoyer si une mauvaise ressource apparaît
     // J'indique le status de la réponse (404)
-    // J'affiche les données du fichier error.html
+    // J'affiche les données du fichier error.ejs
     res.status(404).render(path.join(__dirname, '../views/error.ejs'));
 });
 
+// J'exporte le router pour relier mes différentes routes au projet
 module.exports = router;

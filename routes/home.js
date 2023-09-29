@@ -1,3 +1,4 @@
+// J'importe les modules dont j'aurai besoin
 const express = require('express');
 const path = require('path');
 const router = express.Router();
@@ -7,10 +8,11 @@ const router = express.Router();
 router.get('/', (req, res) => {
     // Ici aucune requête n'est envoyé, mais je traite la réponse (response => res) que le serveur doit envoyé au client
     // J'indique également le status correspondant à la réponse (200 => tout va c'est bien passé)
-    // J'affiche les données de mon fichier index.html grâce à la méthode sendFile
+    // J'affiche les données de mon fichier index.ejs grâce à la méthode render
     const hello = 'Bonjour';
     const year = new Date().getFullYear(); // 2023
     res.status(200).render(path.join(__dirname, '../index.ejs'), { hello, year });
 });
 
+// J'exporte le router pour relier mes différentes routes au projet
 module.exports = router;
