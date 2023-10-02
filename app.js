@@ -3,7 +3,10 @@ const express = require('express'); // express pour faciliter la création du se
 const dotenv = require('dotenv'); // dotenv pour accéder aux variables d'environnement du fichier .env
 const morgan = require('morgan'); // morgan pour afficher des informations au moment des requêtes
 const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+const session = require('express-session');
 const app = express(); // J'initialise le serveur de mon application avec la fonction express.
+
 dotenv.config(); // J'utilise la méthode config de dotenv pour connecter mon fichier .env et accéder à ses variables
 
 const homeRoutes = require('./routes/home');
@@ -14,10 +17,17 @@ const adminRoutes = require('./routes/admin');
 const signRoutes = require('./routes/sign');
 
 app.use(express.json());
+app.use(express.urlencoded({extended: true}));
 
 mongoose.connect(process.env.URL_DATABASE)
 .then(() => console.log('Connexion à MongoDB réussie !'))
 .catch((error) => console.log(`${error}`));
+
+app.use(session({
+    secret: process.env.SECRET_KEY ,
+    resave: false,
+    saveUninitialized: false
+}))
 
 // Je configure l'accès aux données dites "publique" de mon serveur grâce à la méthode static d'express
 app.use('/images', express.static(`${__dirname}/public/images/`)); // les liens des images commenceront maintenant par "/images/" => "/images/monImage.jpg"

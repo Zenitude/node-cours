@@ -7,8 +7,13 @@
 </head>
 <body>
    <%- include('../../components/header.ejs') %>
+   <% if (successCreateUser) { %>
+      <div role="alert">
+         <%= successCreateUser %>
+      </div>
+   <% } %>
     <h1>Création d'un utilisateur</h1>
-    <form action="">
+    <form action="/users/create/add" method="POST">
         <div>
            <label for="lastname">Nom</label>
            <input type="text" id="lastname" name="lastname"> 
@@ -29,6 +34,19 @@
             <label for="confirm">Confirmation Mot de passe</label>
             <input type="password" id="confirm" name="confirm"> 
          </div>
+         <div>
+            <label for="street">N° et Nom de voie</label>
+            <input type="text" id="street" name="street"> 
+         </div>
+         <div>
+            <label for="zipcode">Code postal</label>
+            <input type="text" id="zipcode" name="zipcode" minlength="5" maxlength="5"> 
+         </div>
+         <div>
+            <label for="city">Ville</label>
+            <input type="text" id="city" name="city"> 
+         </div>
+
          <button>Créer</button>
     </form>
 </body>

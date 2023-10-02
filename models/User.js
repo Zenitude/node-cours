@@ -4,7 +4,7 @@ const AddressUser = require('./AddressUser');
 const userSchema = mongoose.Schema({
     lastname: { type: String, required: true, trim: true },
     firstname: { type: String, required: true, trim: true },
-    mail: { type: String, required: true, trim: true },
+    email: { type: String, required: true, trim: true },
     password: { type: String, required: true, trim: true },
     address: { type: mongoose.Schema.Types.ObjectId, ref: AddressUser}
 });

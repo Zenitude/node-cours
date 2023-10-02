@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <% if (detailsUser) { %>
+        <h1>Détails de <%= detailsUser.lastname %> <%= detailsUser.firstname %></h1>
+        <ul>
+            <li>Nom : <%= detailsUser.lastname %></li>
+            <li>Prénom : <%= detailsUser.firstname %></li>
+            <li>Email : <%= detailsUser.email %></li>
+            <li>Adresse : </li>
+            <ul>
+                <li>N° et Nom de voie : <%= detailsUser.address.street %></li>
+                <li>Code Postal : <%= detailsUser.address.zipcode %></li>
+                <li>Commune : <%= detailsUser.address.city %></li>
+            </ul>
+        </ul>
+        <% } %>
+        
+</body>
+</html>

@@ -8,6 +8,28 @@
 <body>
     <%- include('../../components/header.ejs') %>
     <h1>Liste des utilisateurs</h1>
-    
+    <% if(users) { %>
+        <table>
+            <tr>
+                <th>Nom et Prénom</th>
+                <th>Email</th>
+                <th>Adresse</th>
+                <th colspan="2">Actions</th>
+            </tr>
+            <% users.forEach(user => { %>
+                <tr>
+                    <td>
+                        <a href="/users/<%= user._id %>">
+                            <%= user.lastname %> <%= user.firstname %>
+                        </a>
+                    </td>
+                    <td><%= user.email %></td>
+                    <td><%= user.address.street %> <br> <%= user.address.zipcode %> <%= user.address.city %></td>
+                    <td><a href="/users/<%= user._id %>/update">Modifier</a></td>
+                    <td><a href="/users/<%= user._id %>/delete">Supprimer</a></td>
+                </tr>
+            <% }) %>
+        </table>
+    <% } %>
 </body>
 </html>
