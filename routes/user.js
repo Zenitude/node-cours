@@ -10,6 +10,7 @@ router.post('/users/create/add', createUser);
 // Liste des utilisateur (get => afficher la page)
 router.get('/users', getUsers);
 
+// Informations d'un utilisateur spécifique (get => afficher la page)
 router.get('/users/:id', getUserById, getUser);
 
 // Mise à jour d'un utilisateur (get => afficher la page, put => validation formulaire de mise à jour)
