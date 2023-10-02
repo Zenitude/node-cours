@@ -141,6 +141,7 @@ exports.updateUser = () => {}
 exports.removeUser = (req, res) => {
     res.status(200).render(path.join(__dirname, '../views/management/users/delete-user.ejs'))
 }
+
 exports.deleteUser = () => {}
 
 // équivaut à

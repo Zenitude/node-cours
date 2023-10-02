@@ -1,22 +1,24 @@
+// J'importe les modules dont j'aurai besoin
 const express = require('express');
 const router = express.Router();
 const { getUsers, getUser, getUserById, addUser, createUser, updateUser, modifyUser, removeUser, deleteUser } = require('../controllers/users_controller');
 
-// Create
+// Créer un utilisateur (get => afficher la page, post => validation formulaire de création)
 router.get('/users/create', addUser);
 router.post('/users/create/add', createUser);
 
-// Read
+// Liste des utilisateur (get => afficher la page)
 router.get('/users', getUsers);
 
 router.get('/users/:id', getUserById, getUser);
 
-// Update
+// Mise à jour d'un utilisateur (get => afficher la page, put => validation formulaire de mise à jour)
 router.get('/users/:id/update', modifyUser);
 router.put('/users/:id/update', updateUser);
 
-// Delete
+// Supprimer un utilisateur (get => afficher la page, delete => validation formulaire suppression)
 router.get('/users/:id/delete', removeUser);
 router.delete('/users/:id/delete', deleteUser);
 
+// J'exporte le router pour relier mes différentes routes au projet
 module.exports = router;

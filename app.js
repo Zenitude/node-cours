@@ -3,12 +3,12 @@ const express = require('express'); // express pour faciliter la création du se
 const dotenv = require('dotenv'); // dotenv pour accéder aux variables d'environnement du fichier .env
 const morgan = require('morgan'); // morgan pour afficher des informations au moment des requêtes
 const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
 const session = require('express-session');
 const app = express(); // J'initialise le serveur de mon application avec la fonction express.
 
 dotenv.config(); // J'utilise la méthode config de dotenv pour connecter mon fichier .env et accéder à ses variables
 
+// J'importe toutes les routes de mon projet
 const homeRoutes = require('./routes/home');
 const contactRoutes = require('./routes/contact');
 const errorRoutes = require('./routes/error');
@@ -16,9 +16,11 @@ const usersRoutes = require('./routes/user');
 const adminRoutes = require('./routes/admin');
 const signRoutes = require('./routes/sign');
 
+// J'utilise la méthode json pour pouvoir "parser" les données de formulaires, afin de les récupérer grâce à req.body
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
+// Je me connecte à la base de donnée
 mongoose.connect(process.env.URL_DATABASE)
 .then(() => console.log('Connexion à MongoDB réussie !'))
 .catch((error) => console.log(`${error}`));
@@ -39,9 +41,11 @@ app.use((req, res, next) => {
     console.log(new Date().toLocaleDateString());
     next();
 });
+
 // Avec le middleware morgan j'affiche le status et le type de requête, sa vitesse d'exécution et la quantité de données traitées
 app.use(morgan('dev'));
 
+// Mes différentes routes sont des middlewares, j'utilise donc ici la méthode use comme pour un middleware personnalisé/externe
 app.use(homeRoutes);
 app.use(contactRoutes);
 app.use(adminRoutes);
