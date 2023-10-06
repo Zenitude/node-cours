@@ -23,11 +23,12 @@ const verifInputs = (req, res) => {
     }
 }
 
-// Fonction vérifier si un utilisateur existe déjà dans la base de données
+// Fonction pour vérifier si un utilisateur existe déjà dans la base de données
 const findUserByMail = async (req) => {
     return await User.findOne({ email: req.body.email });
 }
 
+// Fonction pour récupérer les informations d'un utilisateur grâce à son identifiant
 const findUserById = async (id) => {
     return await User.findOne({ _id: id});
 }
@@ -76,21 +77,25 @@ const newUser = async (idAddress, req, res) => {
     })
 }
 
+// Fonction pour mettre à jour un utilisateur
 const refreshUser = async (idAddress, req, res, user) => {
+    // On récupère toutes les informations de l'utilisateur venant du formulaire (req.body), de l'url (req.params), ...
     const updatedUser = {
         _id: req.params.id,
         firstname: req.body.firstname,
         lastname: req.body.lastname,
         email: req.body.email,
         password: user.password,
-        birth: req.body.birth,
         address: idAddress
     }
     
+    // On utilise la méthode updateOne de mongoose pour effectuer la mise à jour
     await User.updateOne({ _id: req.params.id}, {...updatedUser})
     .then(result => {
+        // Quand la mise à jour s'effectue on enregistre un message de succès
         req.session.successUpdateUser = `Utilisateur ${updatedUser.lastname} ${updatedUser.firstname} mis à jour avec succès.`;
-
+        
+        // Puis on redirige vers la page de mise à jour pour voir le message
         res.redirect(`/users/${req.params.id}/update`);
     }).catch(error => {
         console.log(error.message)
@@ -208,12 +213,18 @@ exports.modifyUser = async (req, res, next) => {
 // Middleware de validation du formulaire de la page "Mise à jour d'un utilisateur"
 exports.updateUser = async (req, res) => {
     try{
+        /* On vérifie et sécurise les données qui sont envoyées */
         verifInputs(req, res);
         
+        // On vérifie si l'utilisateur existe
         await findUserById(req.params.id).then(user => {
+            // S'il existe on vérifie si l'adresse existe
             findAddress(req).then(address => {
+                // Si l'adresse existe déjà, on met directement à jour l'utilisateur
                 if(address) { refreshUser(address._id, req, res, user); }
-                else { createAddress(req).then(newAddress => {
+                else { 
+                // Si l'adresse n'existe pas, on crée l'adresse puis on met à jour l'utilisateur
+                    createAddress(req).then(newAddress => {
                     refreshUser(newAddress.id, req, res, user);
                 })}
             }).catch(error => {
@@ -231,18 +242,22 @@ exports.updateUser = async (req, res) => {
 // Middleware pour afficher la page "Supprimer un utilisateur"
 exports.removeUser = async (req, res, next) => {
     const detailsUser = res.locals.detailsUser;
-    
     res.status(200).render(path.join(__dirname, `../views/management/users/delete-user.ejs`), { detailsUser })
 }
 
 // Middleware de validation du formulaire de la page "Supprimer un utilisateur"
 exports.deleteUser = async (req, res) => {
     try{
+        // On vérifie si l'utilisateur existe
         await findUserById(req.params.id).then(user => {
+            // S'il n'existe pas on retourne un message d'erreur
             if(!user) {res.status(404).send('User not found');}
             else {
+                // S'il existe on utilise la méthode deleteOne pour le supprimer en fonction de son identifiant qu'on récupère depuis les paramètres de l'url (req.params)
                 user.deleteOne({_id: req.params.id}).then(() => {
+                    // On stocke au niveau de la session un message de succès
                     req.session.successDeleteUser = `Utilisateur ${user.lastname} ${user.firstname} supprimé avec succès.`;
+                    // On redirige vers la liste des utilisateurs pour voir le message apparaître
                     res.redirect(`/users`);
                 }).catch(error => res.status(400).send('Error Delete User ' + error.message))
             }
