@@ -4,6 +4,7 @@ const dotenv = require('dotenv'); // dotenv pour accéder aux variables d'enviro
 const morgan = require('morgan'); // morgan pour afficher des informations au moment des requêtes
 const mongoose = require('mongoose'); // ici mongoose va servir à se connecter à la base de données
 const session = require('express-session'); // permet de créer une session utilisateur pour pouvoir stocker des informations d'une requête http à une autre
+const methodOverride = require('method-override');
 const app = express(); // J'initialise le serveur de mon application avec la fonction express.
 
 dotenv.config(); // J'utilise la méthode config de dotenv pour connecter mon fichier .env et accéder à ses variables
@@ -27,6 +28,7 @@ app.use(express.json());
 /*
     objet json { "lastname": "Doe"} => req.body = { lastname: "Doe"} => req.body.lastname = "Doe"
 */
+app.use(methodOverride('_method'));
 
 // Je me connecte à la base de donnée
 mongoose.connect(process.env.URL_DATABASE)

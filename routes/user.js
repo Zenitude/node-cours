@@ -14,11 +14,11 @@ router.get('/users', getUsers);
 router.get('/users/:id', getUserById, getUser);
 
 // Mise à jour d'un utilisateur (get => afficher la page, put => validation formulaire de mise à jour)
-router.get('/users/:id/update', modifyUser);
+router.get('/users/:id/update', getUserById, modifyUser);
 router.put('/users/:id/update', updateUser);
 
 // Supprimer un utilisateur (get => afficher la page, delete => validation formulaire suppression)
-router.get('/users/:id/delete', removeUser);
+router.get('/users/:id/delete', getUserById, removeUser);
 router.delete('/users/:id/delete', deleteUser);
 
 // J'exporte le router pour relier mes différentes routes au projet

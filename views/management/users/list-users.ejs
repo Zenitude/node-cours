@@ -8,6 +8,9 @@
 <body>
     <%- include('../../components/header.ejs') %>
     <h1>Liste des utilisateurs</h1>
+    <% if(successDeleteUser) { %>
+        <p><%= successDeleteUser %></p>
+    <% } %>
     <% if(users) { %>
         <table>
             <tr>

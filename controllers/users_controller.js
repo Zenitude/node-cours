@@ -28,6 +28,10 @@ const findUserByMail = async (req) => {
     return await User.findOne({ email: req.body.email });
 }
 
+const findUserById = async (id) => {
+    return await User.findOne({ _id: id});
+}
+
 // Fonction pour vérifier si une adresse existe déjà dans la base de données
 const findAddress = async (req) => {
     return await AddressUser.findOne({
@@ -71,6 +75,29 @@ const newUser = async (idAddress, req, res) => {
         res.status(500).json({error: error})
     })
 }
+
+const refreshUser = async (idAddress, req, res, user) => {
+    const updatedUser = {
+        _id: req.params.id,
+        firstname: req.body.firstname,
+        lastname: req.body.lastname,
+        email: req.body.email,
+        password: user.password,
+        birth: req.body.birth,
+        address: idAddress
+    }
+    
+    await User.updateOne({ _id: req.params.id}, {...updatedUser})
+    .then(result => {
+        req.session.successUpdateUser = `Utilisateur ${updatedUser.lastname} ${updatedUser.firstname} mis à jour avec succès.`;
+
+        res.redirect(`/users/${req.params.id}/update`);
+    }).catch(error => {
+        console.log(error.message)
+        console.log('utilisateur non mis à jour Address trouvé');
+    })
+}
+    
 
 // Middleware pour récupérer les informations d'un utilisateur grâce à son id (:id) qui se trouve dans les paramètre de l'url (/users/:id)
 exports.getUserById = async (req, res, next) => {
@@ -150,9 +177,10 @@ exports.createUser = (req, res) => {
 // Middleware pour afficher la page "Liste des utilisateurs"
 exports.getUsers = async (req, res, next) => {
     try{
+        const successDeleteUser = req.session.successDeleteUser ? req.session.successDeleteUser : null;
         /* On récupère les informations de l'utilisateur (find) en oubliant pas de relier la collection addressusers (populate) */
         const users = await User.find().populate('address');
-        res.status(200).render(path.join(__dirname, '../views/management/users/list-users.ejs'), { users })
+        res.status(200).render(path.join(__dirname, '../views/management/users/list-users.ejs'), { users, successDeleteUser })
     }
     catch(error){
         console.error(error.message);
@@ -168,20 +196,61 @@ exports.getUser = (req, res) => {
 }
 
 // Middleware pour afficher la page "Mise à jour d'un utilisateur"
-exports.modifyUser = (req, res) => {
-    res.status(200).render(path.join(__dirname, '../views/management/users/update-user.ejs'))
-}
+exports.modifyUser = async (req, res, next) => {
+    const detailsUser = res.locals.detailsUser;
+    
+    const successUpdateUser = req.session.successUpdateUser
+    ? req.session.successUpdateUser : null;
+    
+    res.status(200).render(path.join(__dirname, `../views/management/users/update-user.ejs`),    { detailsUser, successUpdateUser });
+};
 
 // Middleware de validation du formulaire de la page "Mise à jour d'un utilisateur"
-exports.updateUser = () => {}
+exports.updateUser = async (req, res) => {
+    try{
+        verifInputs(req, res);
+        
+        await findUserById(req.params.id).then(user => {
+            findAddress(req).then(address => {
+                if(address) { refreshUser(address._id, req, res, user); }
+                else { createAddress(req).then(newAddress => {
+                    refreshUser(newAddress.id, req, res, user);
+                })}
+            }).catch(error => {
+                res.status(404).send('Error Find Address' + error.message);
+            })
+        }).catch(error => {
+            res.status(404).send('Error Find User' + error.message);
+        })
+    }catch(error){
+        console.error(error.message);
+        res.status(500).send('Server Error controller');
+    }
+}
 
 // Middleware pour afficher la page "Supprimer un utilisateur"
-exports.removeUser = (req, res) => {
-    res.status(200).render(path.join(__dirname, '../views/management/users/delete-user.ejs'))
+exports.removeUser = async (req, res, next) => {
+    const detailsUser = res.locals.detailsUser;
+    
+    res.status(200).render(path.join(__dirname, `../views/management/users/delete-user.ejs`), { detailsUser })
 }
 
 // Middleware de validation du formulaire de la page "Supprimer un utilisateur"
-exports.deleteUser = () => {}
+exports.deleteUser = async (req, res) => {
+    try{
+        await findUserById(req.params.id).then(user => {
+            if(!user) {res.status(404).send('User not found');}
+            else {
+                user.deleteOne({_id: req.params.id}).then(() => {
+                    req.session.successDeleteUser = `Utilisateur ${user.lastname} ${user.firstname} supprimé avec succès.`;
+                    res.redirect(`/users`);
+                }).catch(error => res.status(400).send('Error Delete User ' + error.message))
+            }
+        }).catch(error =>
+            res.status(400).send('Error Find User ' + error.message)
+        )
+    } catch(error) {res.status(404).send('Error delete' + error.message);}
+}
 
 // équivaut à
 // module.exports = { createUser, getUsers, getUserById, updateUser, deleteUser }
