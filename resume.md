@@ -39,7 +39,7 @@ Ce sont les fichiers dans lesquels indique les différents type de requêtes (GE
 * .delete() : utilisé pour supprimer un élément existant dans une base de données
     * La méthode mongoose qui y est généralement associé est la méthode .deleteOne()
 
-Comment s'organise le fichier ?
+### Comment s'organise le fichier ?
 * On appel en premier les modules nécessaires (express, path, router)
 
 * On définit les différentes routes
