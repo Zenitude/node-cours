@@ -1,32 +1,15 @@
 // J'importe tous les modèles et packages dont j'aurai besoin pour mes middlewares
-const AddressUser = require('../models/AddressUser');
 const User = require('../models/User');
-const { body, validationResult } = require('express-validator');
 const path = require('path');
 const bcrypt = require('bcrypt');
-
+const verifInputs = require('../middlewares/verifInputs');
+const findUserByMail = require('../middlewares/findUserByMail');
+const findAddress = require('../middlewares/findAddress');
+const createAddress = require('../middlewares/createAddress');
 // verifInput va verifier la conformité des données et les sécuriser 
-const verifInputs = (req, res) => {
-    body('lastname', 'Le nom est obligatoire').isString().notEmpty();
-    body('firstname', 'Le prénom est obligatoire').isString().notEmpty();
-    body('email', 'L\'email est obligatoire').isEmail().notEmpty();
-    body('password', 'Le mot de passe est obligatoire').isString().notEmpty();
-    body('confirm', 'La confirmation du mot de passe est obligatoire').isString().notEmpty();
-    body('street', 'Le numéro et nom de voie est obligatoire').isString().notEmpty();
-    body('zipcode', 'Le code postal est obligatoire').isPostalCode('FR').notEmpty();
-    body('city', 'La ville est obligatoire').isString().notEmpty();
-
-    const errors = validationResult(req);
-
-    if(!errors.isEmpty()) {
-        return res.status(422).json({errors: errors.array()});
-    }
-}
 
 // Fonction pour vérifier si un utilisateur existe déjà dans la base de données
-const findUserByMail = async (req) => {
-    return await User.findOne({ email: req.body.email });
-}
+
 
 // Fonction pour récupérer les informations d'un utilisateur grâce à son identifiant
 const findUserById = async (id) => {
@@ -34,23 +17,10 @@ const findUserById = async (id) => {
 }
 
 // Fonction pour vérifier si une adresse existe déjà dans la base de données
-const findAddress = async (req) => {
-    return await AddressUser.findOne({
-        street: req.body.street,
-        zipcode: req.body.zipcode,
-        city: req.body.city
-    })
-}
+
 
 // Fonction pour ajouter une adresse dans la base de données
-const createAddress = async (req) => {
-    const newAddress = new AddressUser({
-        street: req.body.street,
-        zipcode: req.body.zipcode,
-        city: req.body.city
-    });
-    return await newAddress.save();
-}
+
 
 // Fonction pour ajouter un nouvel utilisateur dans la base de données
 const newUser = async (idAddress, req, res) => {
@@ -269,7 +239,7 @@ exports.deleteUser = async (req, res) => {
 
 // équivaut à
 // module.exports = { createUser, getUsers, getUserById, updateUser, deleteUser }
-
+// module.exports = { verifInputs, findUserByMail, findAddress, createAddress}
 
 /*
  req.locals => permet de récupérer des informations afin de les stocker d'une requête http vers elle-même (get > get)

@@ -11,7 +11,8 @@ router.get('/', (req, res) => {
     // J'affiche les données de mon fichier index.ejs grâce à la méthode render
     const hello = 'Bonjour';
     const year = new Date().getFullYear(); // 2023
-    res.status(200).render(path.join(__dirname, '../index.ejs'), { hello, year });
+    const userConnected = req.session.userConnected ? req.session.userConnected : null;
+    res.status(200).render(path.join(__dirname, '../index.ejs'), { hello, year, userConnected });
 });
 
 // J'exporte le router pour relier mes différentes routes au projet
