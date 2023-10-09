@@ -36,20 +36,39 @@ exports.signup = async (req, res) => {
     const userConnected = req.session.userConnected
     ? req.session.userConnected
     : null;
-    res.status(200).render(path.join(__dirname, `../views/sign/signup.ejs`), { userConnected });
+
+    // Si l'utilisateur est connecté je redirige vers l'accueil
+    if(userConnected) {
+        res.status(300).redirect(`/`);
+
+    // Si l'utilisateur n'est pas connecté il peut accéder à la page d'inscription
+    } else {
+        res.status(200).render(path.join(__dirname, `../views/sign/signup.ejs`));
+    }
+    
 };
 
 // Middleware de validation de formulaire d'inscription
 exports.createUser = async (req, res) => {
     try{
+        // On vérifie que le Mot de passe et la confirmation soient identique
         if(req.body.password === req.body.confirm) {
+            // On sécurise les données envoyées
             verifInputs(req, res);
 
+            // On commence par vérifier si l'utilisateur existe en fonction de son email
             await findUserByMail(req).then(user => {
+                // Si l'utilisateur existe on envois un message
                 if(user) { res.status(400).send('User Already Exist'); }
+
+                // Si l'utilisateur n'existe pas on continue
                 else {
+                    // On vérifie si l'adresse saisie existe
                     findAddress(req).then(address => {
+                        // Si l'adresse existe déjà on inscrit l'utilisateur
                         if(address) { signUser(address.id, req, res) }
+
+                        // Si l'adresse n'existe pas on crée d'abord l'adresse puis on inscrit l'utilisateur
                         else {
                             createAddress(req)
                             .then(result => signUser(result.id, req, res))
@@ -73,8 +92,11 @@ exports.signin = async (req, res) => {
     ? req.session.userConnected
     : null;
 
+    // Si l'utilisateur est connecté je le redirige vers l'accueil
     if(userConnected) {
         res.status(300).redirect(`/`);
+
+    // Si l'utilisateur n'est pas connecté il peut accéder à la page de connexion
     } else {
         res.status(200).render(path.join(__dirname, `../views/sign/signin.ejs`));
     }
@@ -83,14 +105,26 @@ exports.signin = async (req, res) => {
 // Middleware de validation de formulaire de connexion
 exports.login = async (req, res) => {
     try {
+        // On vérifie si l'utilisateur existe grâce à son email
         await findUserByMail(req).then(user => {
-            const compare = bcrypt.compare(req.body.password, user.password);
-            if(compare) {
-                req.session.userConnected = `Bienvenue ${user.lastname} ${user.firstname}`;
-                res.status(200).redirect('/');
+            // Si l'utilisateur existe on continue
+            if(user) {
+                // On compare le mot de passe qui a été saisie et celui qui est stocké dans la base de données
+                const compare = bcrypt.compare(req.body.password, user.password);
+
+                // Si la comparaison est valide on valide la connexion et on redirige vers l'accueil
+                if(compare) {
+                    req.session.userConnected = `Bienvenue ${user.lastname} ${user.firstname}`;
+                    res.status(200).redirect('/');
+                
+                // Si la comparaison échoue on affiche un message
+                }   else {
+                    res.status(401).send('Mot de passe ou Email incorrect');
+                }
+            // Si l'utilisateur n'existe pas on affiche un message
             } else {
                 res.status(401).send('Mot de passe ou Email incorrect');
-            }
+            } 
         })
         .catch(error => res.status(404).send('User not found ' + error.message))
     }

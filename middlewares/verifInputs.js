@@ -1,5 +1,7 @@
+// appel des méthodes liées à express-validator
 const { body, validationResult } = require('express-validator');
 
+// verifInputs va verifier la conformité des données et les sécuriser 
 const verifInputs = (req, res) => {
     body('lastname', 'Le nom est obligatoire').isString().notEmpty();
     body('firstname', 'Le prénom est obligatoire').isString().notEmpty();
@@ -16,4 +18,5 @@ const verifInputs = (req, res) => {
     }
 }
 
+// Export du middleware
 module.exports = verifInputs;

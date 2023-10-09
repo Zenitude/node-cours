@@ -1,5 +1,7 @@
+// Appel du modèle AddressUser
 const AddressUser = require('../models/AddressUser');
 
+// Fonction pour vérifier si une adresse existe déjà dans la base de données
 const findAddress = async (req) => {
     return await AddressUser.findOne({
         street: req.body.street,
@@ -8,4 +10,5 @@ const findAddress = async (req) => {
     })
 }
 
+// Export du middleware
 module.exports = findAddress;

@@ -2,25 +2,17 @@
 const User = require('../models/User');
 const path = require('path');
 const bcrypt = require('bcrypt');
+
+// J'importe les middlewares dont j'ai besoin
 const verifInputs = require('../middlewares/verifInputs');
 const findUserByMail = require('../middlewares/findUserByMail');
 const findAddress = require('../middlewares/findAddress');
 const createAddress = require('../middlewares/createAddress');
-// verifInput va verifier la conformité des données et les sécuriser 
-
-// Fonction pour vérifier si un utilisateur existe déjà dans la base de données
-
 
 // Fonction pour récupérer les informations d'un utilisateur grâce à son identifiant
 const findUserById = async (id) => {
     return await User.findOne({ _id: id});
 }
-
-// Fonction pour vérifier si une adresse existe déjà dans la base de données
-
-
-// Fonction pour ajouter une adresse dans la base de données
-
 
 // Fonction pour ajouter un nouvel utilisateur dans la base de données
 const newUser = async (idAddress, req, res) => {
