@@ -8,7 +8,8 @@ router.get('/contact', (req, res) => {
     // Pour cette ressource je traite la réponse adéquate
     // J'indique le status de la réponse (200)
     // J'affiche les données du fichier contact.ejs
-    res.status(200).render(path.join(__dirname, '../views/contact.ejs'));
+    const isConnected = req.session.isConnected ? req.session.isConnected : false ;
+    res.status(200).render(path.join(__dirname, '../views/contact.ejs'), { isConnected });
 });
 
 // J'exporte le router pour relier mes différentes routes au projet

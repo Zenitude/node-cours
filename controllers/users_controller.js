@@ -88,7 +88,8 @@ exports.getUserById = async (req, res, next) => {
 exports.addUser = (req, res) => {
     /* On récupère si c'est le cas, la variable de session successCreateUSer pour afficher son contenu dans la page */
     const successCreateUser = req.session.successCreateUser ? req.session.successCreateUser : null;
-    res.status(200).render(path.join(__dirname, '../views/management/users/create-user.ejs'), { successCreateUser });
+    const isConnected = req.session.isConnected ? req.session.isConnected : false;
+    res.status(200).render(path.join(__dirname, '../views/management/users/create-user.ejs'), { isConnected, successCreateUser });
 }
 
 // Middleware de validation du formulaire de la page "Créer un utilisateur"
@@ -145,9 +146,10 @@ exports.createUser = (req, res) => {
 exports.getUsers = async (req, res, next) => {
     try{
         const successDeleteUser = req.session.successDeleteUser ? req.session.successDeleteUser : null;
+        const isConnected = req.session.isConnected ? req.session.isConnected : false;
         /* On récupère les informations de l'utilisateur (find) en oubliant pas de relier la collection addressusers (populate) */
         const users = await User.find().populate('address');
-        res.status(200).render(path.join(__dirname, '../views/management/users/list-users.ejs'), { users, successDeleteUser })
+        res.status(200).render(path.join(__dirname, '../views/management/users/list-users.ejs'), { users, successDeleteUser, isConnected })
     }
     catch(error){
         console.error(error.message);
@@ -159,7 +161,8 @@ exports.getUsers = async (req, res, next) => {
 exports.getUser = (req, res) => {
     /* On récupère les informations issue du middleware getUserById en les stockant dans une variable */
     const detailsUser = res.locals.detailsUser ? res.locals.detailsUser : null;
-    res.status(200).render(path.join(__dirname, '../views/management/users/detail-user.ejs'), { detailsUser });
+    const isConnected = req.session.isConnected ? req.session.isConnected : false;
+    res.status(200).render(path.join(__dirname, '../views/management/users/detail-user.ejs'), { isConnected, detailsUser });
 }
 
 // Middleware pour afficher la page "Mise à jour d'un utilisateur"
@@ -168,8 +171,9 @@ exports.modifyUser = async (req, res, next) => {
     
     const successUpdateUser = req.session.successUpdateUser
     ? req.session.successUpdateUser : null;
+    const isConnected = req.session.isConnected ? req.session.isConnected : false;
     
-    res.status(200).render(path.join(__dirname, `../views/management/users/update-user.ejs`),    { detailsUser, successUpdateUser });
+    res.status(200).render(path.join(__dirname, `../views/management/users/update-user.ejs`),    { detailsUser, successUpdateUser, isConnected });
 };
 
 // Middleware de validation du formulaire de la page "Mise à jour d'un utilisateur"
@@ -204,7 +208,8 @@ exports.updateUser = async (req, res) => {
 // Middleware pour afficher la page "Supprimer un utilisateur"
 exports.removeUser = async (req, res, next) => {
     const detailsUser = res.locals.detailsUser;
-    res.status(200).render(path.join(__dirname, `../views/management/users/delete-user.ejs`), { detailsUser })
+    const isConnected = req.session.isConnected ? req.session.isConnected : false;
+    res.status(200).render(path.join(__dirname, `../views/management/users/delete-user.ejs`), { isConnected, detailsUser })
 }
 
 // Middleware de validation du formulaire de la page "Supprimer un utilisateur"

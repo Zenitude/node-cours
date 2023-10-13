@@ -5,7 +5,7 @@ const morgan = require('morgan'); // morgan pour afficher des informations au mo
 const mongoose = require('mongoose'); // ici mongoose va servir à se connecter à la base de données
 const session = require('express-session'); // permet de créer une session utilisateur pour pouvoir stocker des informations d'une requête http à une autre
 const methodOverride = require('method-override'); // Permet d'ajouter un paramètre à l'url d'action d'un formulaire pour exécuter les requêtes PUT et DELETE
-const cookieParser = require('cookie-parser');
+const cookieParser = require('cookie-parser'); // Permet de récupérer les données des cookie de l'objet request
 const app = express(); // J'initialise le serveur de mon application avec la fonction express.
 
 dotenv.config(); // J'utilise la méthode config de dotenv pour connecter mon fichier .env et accéder à ses variables
@@ -13,22 +13,18 @@ dotenv.config(); // J'utilise la méthode config de dotenv pour connecter mon fi
 // J'importe toutes les routes de mon projet
 const homeRoutes = require('./routes/home');
 const contactRoutes = require('./routes/contact');
-const errorRoutes = require('./routes/error');
 const usersRoutes = require('./routes/user');
 const adminRoutes = require('./routes/admin');
 const signRoutes = require('./routes/sign');
+const errorRoutes = require('./routes/error');
 
 // J'utilise la méthode urlencoded pour récupérer les informations d'un formulaire et les stocker dans req.body
 app.use(express.urlencoded({extended: true}));
-/*
-    <input name="lastname" value="Doe"> => { "lastname": "Doe"} (objet json)
-*/
+/* <input name="lastname" value="Doe"> => { "lastname": "Doe"} (objet json) */
 
 // J'utilise la méthode json pour pouvoir "parser" les données json en objet js, afin de les récupérer grâce à req.body
 app.use(express.json());
-/*
-    objet json { "lastname": "Doe"} => req.body = { lastname: "Doe"} => req.body.lastname = "Doe"
-*/
+/* objet json { "lastname": "Doe"} => req.body = { lastname: "Doe"} => req.body.lastname = "Doe" */
 
 // On indique à method-override le nom du paramètre qui indique les types de requêtes PUT et DELETE
 app.use(methodOverride('_method'));
@@ -63,9 +59,9 @@ app.use(morgan('dev'));
 // Mes différentes routes sont des middlewares, j'utilise donc ici la méthode use comme pour un middleware personnalisé/externe
 app.use(homeRoutes);
 app.use(contactRoutes);
+app.use(signRoutes);
 app.use(adminRoutes);
 app.use(usersRoutes);
-app.use(signRoutes);
 app.use(errorRoutes);
 
 // J'écoute les informations émis par mon application (app) avec la méthode listen, sans cette méthode le serveur ne peut fonctionner

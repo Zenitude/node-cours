@@ -9,10 +9,9 @@ router.get('/', (req, res) => {
     // Ici aucune requête n'est envoyé, mais je traite la réponse (response => res) que le serveur doit envoyé au client
     // J'indique également le status correspondant à la réponse (200 => tout va c'est bien passé)
     // J'affiche les données de mon fichier index.ejs grâce à la méthode render
-    const hello = 'Bonjour';
-    const year = new Date().getFullYear(); // 2023
     const userConnected = req.session.userConnected ? req.session.userConnected : null;
-    res.status(200).render(path.join(__dirname, '../index.ejs'), { hello, year, userConnected });
+    const isConnected = req.session.isConnected ? req.session.isConnected : false ;
+    res.status(200).render(path.join(__dirname, '../index.ejs'), { isConnected, userConnected });
 });
 
 // J'exporte le router pour relier mes différentes routes au projet

@@ -23,14 +23,23 @@ const signUser = async (idAddress, req, res) => {
 
     /* Sauvegarde des données du nouvel utilisateur dans la base de données grâce à la méthode .save de mongoose */
     user.save().then(result => {
-        /* On crée une variable de session pour pouvoir l'utiliser sur un autre type de requête http (post => get) */
+        // Je crée mes variable de session (userConnected => message accueil, isConnected => navigation header dynamique)
         req.session.userConnected = `Bienvenue ${result.lastname} ${result.firstname}.`
+        req.session.isConnected = true;
         
-        jwt.sign(
+        // Je crée mon token d'authentification grâce à JsonWebToken, en lui définissant un id utilisateur, une clé de décryptage, et la durée d'existance du token
+        const token = jwt.sign(
             { userId: result._id},
             process.env.SECRET_KEY_TOKEN,
             { expiresIn: '7d'}
         );
+
+        // Je crée mon cookie, en lui définissant un nom, en lui donnant son contenu (le token crée juste au dessus), puis je définis ses options
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: true,
+            maxAge: 604800000
+        });
         
         /* On redirige vers la page de création d'un utilisateur */
         res.status(200).redirect('/');
@@ -41,17 +50,17 @@ const signUser = async (idAddress, req, res) => {
 
 // Middleware d'affichage de la page d'inscription
 exports.signup = async (req, res) => {
-    const userConnected = req.session.userConnected
-    ? req.session.userConnected
-    : null;
+    const isConnected = req.session.isConnected
+    ? req.session.isConnected
+    : false;
 
     // Si l'utilisateur est connecté je redirige vers l'accueil
-    if(userConnected) {
+    if(isConnected) {
         res.status(300).redirect(`/`);
 
     // Si l'utilisateur n'est pas connecté il peut accéder à la page d'inscription
     } else {
-        res.status(200).render(path.join(__dirname, `../views/sign/signup.ejs`));
+        res.status(200).render(path.join(__dirname, `../views/sign/signup.ejs`), { isConnected });
     }
     
 };
@@ -96,17 +105,17 @@ exports.createUser = async (req, res) => {
 
 // Middleware d'affichage de la page de connexion
 exports.signin = async (req, res) => {
-    const userConnected = req.session.userConnected
-    ? req.session.userConnected
-    : null;
+    const isConnected = req.session.isConnected
+    ? req.session.isConnected
+    : false;
 
     // Si l'utilisateur est connecté je le redirige vers l'accueil
-    if(userConnected) {
+    if(isConnected) {
         res.status(300).redirect(`/`);
 
     // Si l'utilisateur n'est pas connecté il peut accéder à la page de connexion
     } else {
-        res.status(200).render(path.join(__dirname, `../views/sign/signin.ejs`));
+        res.status(200).render(path.join(__dirname, `../views/sign/signin.ejs`), { isConnected });
     }
 };
 
@@ -122,20 +131,25 @@ exports.login = async (req, res) => {
 
                 // Si la comparaison est valide on valide la connexion et on redirige vers l'accueil
                 if(compare) {
+                    // Je crée mes variable de session (userConnected => message accueil, isConnected => navigation header dynamique)
                     req.session.userConnected = `Bienvenue ${user.lastname} ${user.firstname}`;
+                    req.session.isConnected = true;
                     
+                    // Je crée mon token d'authentification grâce à JsonWebToken, en lui définissant un id utilisateur, une clé de décryptage, et la durée d'existance du token
                     const token = jwt.sign(
                         { userId: user._id},
                         process.env.SECRET_KEY_TOKEN,
                         { expiresIn: '7d'}
                     );
 
+                    // Je crée mon cookie, en lui définissant un nom, en lui donnant son contenu (le token crée juste au dessus), puis je définis ses options
                     res.cookie('token', token, {
                         httpOnly: true,
                         secure: true,
-                        maxAge: 604800000
+                        maxAge: 604800000 // millisecondes
                     });
                     
+                    // Je redirige vers l'accueil
                     res.status(200).redirect('/');
                 
                 // Si la comparaison échoue on affiche un message
@@ -154,21 +168,32 @@ exports.login = async (req, res) => {
     }
 }
 
-// Middleware de validation de formulaire de déconnexion
+// Middleware pour afficher la page "Déconnexion"
 exports.logout = (req, res) => {
+    // Je récupère l'id de l'utilisateur stocké dans la propriété decodedToken qui contient l'id du token d'authentification
     const userId = req.decodedToken.userId ? req.decodedToken.userId : null;
+    const isConnected = req.session.isConnected ? req.session.isConnected : false;
     
+    // Si l'utilisateur est connecté il peut accéder à la page de déconnexion
     if(userId) {
-        res.status(200).render(path.join(__dirname, `../views/sign/logout.ejs`))
+        res.status(200).render(path.join(__dirname, `../views/sign/logout.ejs`), { isConnected })
+
+    // Dans le cas contraire il est redirigé vers la page d'accueil
     } else {
         res.status(300).redirect(`/`);
     }
 };
 
+// Middleware de validation de formulaire de déconnexion
 exports.disconnect = async (req, res, next) => {
     try{
+        // Je nettoies tous les cookies qui ont été créés avec la méthode clearCookie
         res.clearCookie('token');
+
+        // Je supprime toutes les variables de session qui ont été créé en détruisant la session avec la méthode destroy
         req.session.destroy();
+
+        // Je redirige vers l'accueil
         res.redirect('/');
     } catch(error) {
         res.status(500).send('Erreur Inscription Try ' + error.message)

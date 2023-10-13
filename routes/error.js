@@ -9,7 +9,8 @@ router.use((req, res) => {
     // Je traite la réponse à envoyer si une mauvaise ressource apparaît
     // J'indique le status de la réponse (404)
     // J'affiche les données du fichier error.ejs
-    res.status(404).render(path.join(__dirname, '../views/error.ejs'));
+    const isConnected = req.session.isConnected ? req.session.isConnected : false ;
+    res.status(404).render(path.join(__dirname, '../views/error.ejs'), { isConnected });
 });
 
 // J'exporte le router pour relier mes différentes routes au projet

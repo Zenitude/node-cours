@@ -9,13 +9,8 @@
 <body>
     <%- include('./views/components/header.ejs') %>
     <h1>Accueil</h1>
-    <% if(hello === 'bonjour') { %>
-        <p><%= hello %> <%= year %></p>
-    <% } else { %>
-        <p>blabla</p>
-    <% } %>
 
-    <% if(userConnected) { %>
+    <% if(isConnected) { %>
         <p><%= userConnected %></p>
     <% } %>
     
