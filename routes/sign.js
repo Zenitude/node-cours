@@ -1,6 +1,7 @@
 // J'importe les modules dont j'aurai besoin
 const express = require('express');
 const router = express.Router();
+const { authMiddleware } = require('../middlewares/authMiddleware');
 
 const { signup, createUser, signin, login, logout, disconnect } =
 require('../controllers/sign_controller');
@@ -14,8 +15,8 @@ router.get('/signup', signup);
 router.post('/signup/create', createUser);
 
 // Déconnexion (post => validation formulaire déconnexion)
-router.get('/logout', logout)
-router.post('/logout/disconnect', disconnect);
+router.get('/logout', authMiddleware, logout)
+router.post('/logout/disconnect', authMiddleware, disconnect);
 
 // J'exporte le router pour relier mes différentes routes au projet
 module.exports = router;

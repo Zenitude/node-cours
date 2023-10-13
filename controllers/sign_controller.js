@@ -6,6 +6,7 @@ const findUserByMail = require('../middlewares/findUserByMail');
 const findAddress = require('../middlewares/findAddress');
 const createAddress = require('../middlewares/createAddress');
 const path = require('path');
+const jwt = require('jsonwebtoken');
 
 const signUser = async (idAddress, req, res) => {
     // Hashage du mot de passe grâce à la méthode hash du package bcrypt
@@ -24,6 +25,13 @@ const signUser = async (idAddress, req, res) => {
     user.save().then(result => {
         /* On crée une variable de session pour pouvoir l'utiliser sur un autre type de requête http (post => get) */
         req.session.userConnected = `Bienvenue ${result.lastname} ${result.firstname}.`
+        
+        jwt.sign(
+            { userId: result._id},
+            process.env.SECRET_KEY_TOKEN,
+            { expiresIn: '7d'}
+        );
+        
         /* On redirige vers la page de création d'un utilisateur */
         res.status(200).redirect('/');
     }).catch(error => {
@@ -115,6 +123,19 @@ exports.login = async (req, res) => {
                 // Si la comparaison est valide on valide la connexion et on redirige vers l'accueil
                 if(compare) {
                     req.session.userConnected = `Bienvenue ${user.lastname} ${user.firstname}`;
+                    
+                    const token = jwt.sign(
+                        { userId: user._id},
+                        process.env.SECRET_KEY_TOKEN,
+                        { expiresIn: '7d'}
+                    );
+
+                    res.cookie('token', token, {
+                        httpOnly: true,
+                        secure: true,
+                        maxAge: 604800000
+                    });
+                    
                     res.status(200).redirect('/');
                 
                 // Si la comparaison échoue on affiche un message
@@ -135,7 +156,21 @@ exports.login = async (req, res) => {
 
 // Middleware de validation de formulaire de déconnexion
 exports.logout = (req, res) => {
-    res.status(200).render(path.join(__dirname, '../views/sign/logout.ejs'))
-}
+    const userId = req.decodedToken.userId ? req.decodedToken.userId : null;
+    
+    if(userId) {
+        res.status(200).render(path.join(__dirname, `../views/sign/logout.ejs`))
+    } else {
+        res.status(300).redirect(`/`);
+    }
+};
 
-exports.disconnect = (req, res) => {}
+exports.disconnect = async (req, res, next) => {
+    try{
+        res.clearCookie('token');
+        req.session.destroy();
+        res.redirect('/');
+    } catch(error) {
+        res.status(500).send('Erreur Inscription Try ' + error.message)
+    }
+}
