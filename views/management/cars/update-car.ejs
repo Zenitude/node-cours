@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <%- include('../../components/header.ejs') %>
+    <% if(successUpdateCar) { %> 
+      <p><%= successUpdateCar %></p>
+    <% } %>
+    <h1>Mise à jour d'un véhicule</h1>
+    <form action="/users/<%= detailsCar._id %>/update?_method=PUT" method="POST">
+        <div>
+            <label for="brand">Marque</label>
+            <input type="text" id="brand" name="brand" value="<%= detailsCar ? detailsCar.brand.name : "" %>"> 
+         </div>
+         <div>
+             <label for="model">Modèle</label>
+             <input type="text" id="model" name="model" value="<%= detailsCar ? detailsCar.model : "" %>"> 
+          </div>
+          <div>
+             <label for="immat">Immatriculation</label>
+             <input type="text" id="immat" name="immat" value="<%= detailsCar ? detailsCar.immat : "" %>"> 
+          </div>
+          <div>
+             <label for="doors">Nombre de portes</label>
+             <input type="number" id="doors" name="doors" value="<%= detailsCar ? detailsCar.doors : "" %>"> 
+          </div>
+          <div>
+             <label for="clim">Climatisation</label>
+             <select name="clim" id="clim">
+                 <option value="0" <%= detailsCar ? (detailsCar.clim === false ? "selected" : "")  : "" %>>Non</option>
+                 <option value="1" <%= detailsCar ? (detailsCar.clim === true ? "selected" : "")  : "" %>>Oui</option>
+             </select>
+          </div>
+         <button>Modifier</button>
+    </form>
+</body>
+</html>

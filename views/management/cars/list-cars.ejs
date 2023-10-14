@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <%- include('../../components/header.ejs') %>
+    <h1>Liste des véhicules</h1>
+    <% if(successDeleteCar) { %>
+        <p><%= successDeleteCar %></p>
+    <% } %>
+    <% if(cars) { %>
+        <table>
+            <tr>
+                <th>Marque et Modèle</th>
+                <th>Immatriculation</th>
+                <th>Nombre de portes</th>
+                <th>Climatisation</th>
+                <th colspan="2">Actions</th>
+            </tr>
+            <% cars.forEach(car => { %>
+                <tr>
+                    <td>
+                        <a href="/cars/<%= car._id %>">
+                            <%= car.brand.name %> <%= car.model %>
+                        </a>
+                    </td>
+                    <td><%= car.immat %></td>
+                    <td><%= car.doors %></td>
+                    <td><%= car.clim %></td>
+                    <td><a href="/cars/<%= car._id %>/update">Modifier</a></td>
+                    <td><a href="/cars/<%= car._id %>/delete">Supprimer</a></td>
+                </tr>
+            <% }) %>
+        </table>
+    <% } %>
+</body>
+</html>

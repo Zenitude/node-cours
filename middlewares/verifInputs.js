@@ -11,6 +11,12 @@ const verifInputs = (req, res) => {
     body('street', 'Le numéro et nom de voie est obligatoire').isString().notEmpty();
     body('zipcode', 'Le code postal est obligatoire').isPostalCode('FR').notEmpty();
     body('city', 'La ville est obligatoire').isString().notEmpty();
+    body('brand', 'La marque est obligatoire').isString().notEmpty();
+    body('model', 'Le model est obligatoire').isString().notEmpty();
+    body('immat', 'Imattriculation est obligatoire').isString().notEmpty();
+    body('doors', 'Nombre de portes est obligatoire').isNumeric().notEmpty();
+    body('clim', 'Climatisation est obligatoire').isString().notEmpty();
+
 
     const errors = validationResult(req);
     if(!errors.isEmpty()) {

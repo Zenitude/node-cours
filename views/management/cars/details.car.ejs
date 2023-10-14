@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <% if (detailsCar) { %>
+        <h1>Détails de <%= detailsCar.brand.name %> <%= detailsCar.model %></h1>
+        <ul>
+            <li>Marque : <%= detailsCar.brand.name %></li>
+            <li>Modèle : <%= detailsCar.model %></li>
+            <li>Immatriculation : <%= detailsCar.immat %></li>
+            <li>Nombre de portes : <%= detailsCar.doors %></li>
+            <li>Climatisation : <%= detailsCar.clim === true ? 'Non' : 'Oui' %></li>
+        </ul>
+        <% } %>
+</body>
+</html>
