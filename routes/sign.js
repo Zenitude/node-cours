@@ -4,8 +4,7 @@ const router = express.Router();
 const { authMiddleware } = require('../middlewares/authMiddleware');
 const { verifSign } = require('../middlewares/verifSign');
 
-const { signup, createUser, signin, login, logout, disconnect } =
-require('../controllers/sign_controller');
+const { signup, createUser, signin, login, logout, disconnect } = require('../controllers/sign_controller');
 
 // Connexion (get => afficher la page, post => validation formulaire connexion)
 router.get('/signin', verifSign, signin);

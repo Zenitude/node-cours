@@ -11,10 +11,10 @@
       <p><%= successUpdateCar %></p>
     <% } %>
     <h1>Mise à jour d'un véhicule</h1>
-    <form action="/users/<%= detailsCar._id %>/update?_method=PUT" method="POST">
+    <form action="/cars/<%= detailsCar._id %>/update?_method=PUT" method="POST">
         <div>
             <label for="brand">Marque</label>
-            <input type="text" id="brand" name="brand" value="<%= detailsCar ? detailsCar.brand.name : "" %>"> 
+            <input type="text" id="brand" name="brand" value="<%= detailsCar && detailsCar.brand ? detailsCar.brand.company : "" %>"> 
          </div>
          <div>
              <label for="model">Modèle</label>

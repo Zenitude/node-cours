@@ -4,7 +4,7 @@ const uniqueValidator = require('mongoose-unique-validator');
 
 // J'utilise la méthode Schema pour définir le model de document pour la collection brands
 const brandSchema = mongoose.Schema({
-    name: { type: String, required: true, trim: true, unique: true },
+    company: { type: String, required: true, trim: true, unique: true },
 });
 
 brandSchema.plugin(uniqueValidator);
