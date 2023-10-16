@@ -24,12 +24,12 @@
                 <tr>
                     <td>
                         <a href="/cars/<%= car._id %>">
-                            <%= car.brand.name %> <%= car.model %>
+                            <%= car.brand.company %> <%= car.model %>
                         </a>
                     </td>
                     <td><%= car.immat %></td>
                     <td><%= car.doors %></td>
-                    <td><%= car.clim %></td>
+                    <td><%= car.clim ? 'Oui' : 'Non' %></td>
                     <td><a href="/cars/<%= car._id %>/update">Modifier</a></td>
                     <td><a href="/cars/<%= car._id %>/delete">Supprimer</a></td>
                 </tr>

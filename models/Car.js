@@ -1,6 +1,6 @@
 // J'importe les modules et les potentiels modèles nécessaires
 const mongoose = require('mongoose');
-const Brand = require('./AddressUser');
+const Brand = require('./Brand');
 const uniqueValidator = require('mongoose-unique-validator');
 
 // J'utilise la méthode Schema pour définir le model de document pour la collection cars

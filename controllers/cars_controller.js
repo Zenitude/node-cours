@@ -4,7 +4,7 @@ const Car = require('../models/Car');
 const path = require('path');
 
 // J'importe les middlewares dont j'ai besoin
-const verifInputs = require('../middlewares/verifInputs');
+const verifInputsCar = require('../middlewares/verifInputsCar');
 
 // Fonction pour trouver un véhicule selon son immatriculation
 const findCarByImmat = async (req) => {
@@ -21,13 +21,13 @@ const findBrand = async (req) => {
 // Fonction pour ajouter une nouvelle marque dans la base de données
 const newBrand = async (req) => {
     const newBrand = new Brand({
-        name: req.body.brand
+        company: req.body.brand
     });
     return await newBrand.save();
 }
 
 // Fonction pour ajouter un nouveau véhicule dans la base de données
-const newCar = async (req) => {
+const newCar = async (idBrand, req, res) => {
     // Conversion des données pour la climatisation (string > boolean)
     const clim = req.body.clim === "0" ? false : true;
 
@@ -40,10 +40,12 @@ const newCar = async (req) => {
         brand: req.body.brand
     });
 
+    const brand = await Brand.findOne({_id: idBrand});
+
     /* Sauvegarde des données du nouveau véhicule dans la base de données grâce à la méthode .save de mongoose */
     car.save().then(result => {
         /* On crée une variable de session pour pouvoir l'utiliser sur un autre type de requête http (post => get) */
-        req.session.successCreateCar = `Véhicule ${result.brand} ${result.model} créé avec succès.`
+        req.session.successCreateCar = `Véhicule ${brand.company} ${result.model} créé avec succès.`
         /* On redirige vers la page de création d'un véhicule */
         res.status(200).redirect('/cars/create');
     }).catch(error => {
@@ -65,12 +67,14 @@ const refreshCar = async (idBrand, req, res) => {
         clim: clim,
         brand: idBrand
     }
+
+    const brand = Brand.findOne({_id: idBrand});
     
     // On utilise la méthode updateOne de mongoose pour effectuer la mise à jour
     await Car.updateOne({ _id: req.params.id}, {...updatedCar})
     .then(result => {
         // Quand la mise à jour s'effectue on enregistre un message de succès
-        req.session.successUpdateCar = `Véhicule ${updatedCar.brand} ${updatedCar.model} mis à jour avec succès.`;
+        req.session.successUpdateCar = `Véhicule ${brand.company} ${updatedCar.model} mis à jour avec succès.`;
         
         // Puis on redirige vers la page de mise à jour pour voir le message
         res.redirect(`/cars/${req.params.id}/update`);
@@ -90,7 +94,7 @@ exports.getCarById = async (req, res, next) => {
             On stocke les données du véhicule localement avec la propriété locals de l'objet request   
             qui permet de transférer des informations d'une requête vers elle-même (get /users/:id => get /users/:id)
         */
-        req.locals.detailsCar = car;
+        res.locals.detailsCar = car;
 
         /* Comme le middleware se situera au milieu d'une requête on utilise next pour passer au middleware suivant */
         next();
@@ -112,7 +116,7 @@ exports.addCar = async (req, res) => {
 exports.createCar = async (req, res) => {
     try {
         /* On vérifie et sécurise les données qui sont envoyées */
-        verifInputs(req, res);
+        verifInputsCar(req, res);
 
         /* On vérifie si l'véhicule existe déjà dans la base de données */
         findCarByImmat(req)
@@ -197,7 +201,7 @@ exports.modifyCar = async (req, res) => {
 exports.updateCar = async (req, res) => {
     try{
         /* On vérifie et sécurise les données qui sont envoyées */
-        verifInputs(req, res);
+        verifInputsCar(req, res);
         
         // On vérifie si le véhicule existe
         await findCarById(req.params.id).then(car => {
