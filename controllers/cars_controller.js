@@ -14,7 +14,7 @@ const findCarByImmat = async (req) => {
 // Fonction pour trouver une marque dans la base de données
 const findBrand = async (req) => {
     return await Brand.findOne({
-        name: req.body.brand
+        company: req.body.brand
     });
 }
 
@@ -29,7 +29,7 @@ const newBrand = async (req) => {
 // Fonction pour ajouter un nouveau véhicule dans la base de données
 const newCar = async (idBrand, req, res) => {
     // Conversion des données pour la climatisation (string > boolean)
-    const clim = req.body.clim === "0" ? false : true;
+    const clim = await req.body.clim === "0" ? false : true;
 
     // Création d'un nouveau véhicule (new Car) avec les données du formulaire (req.body)
     const car = new Car({
@@ -37,7 +37,7 @@ const newCar = async (idBrand, req, res) => {
         model: req.body.model,
         doors: req.body.doors,
         clim: clim,
-        brand: req.body.brand
+        brand: idBrand
     });
 
     const brand = await Brand.findOne({_id: idBrand});
@@ -56,7 +56,7 @@ const newCar = async (idBrand, req, res) => {
 // Fonction pour mettre à jour un véhicule
 const refreshCar = async (idBrand, req, res) => {
     // Conversion des données pour la climatisation (string > boolean)
-    const clim = req.body.clim === "0" ? false : true;
+    const clim = await req.body.clim === "0" ? false : true;
 
     // On récupère toutes les informations du véhicule venant du formulaire (req.body), de l'url (req.params), ...
     const updatedCar = {
@@ -136,6 +136,7 @@ exports.createCar = async (req, res) => {
                     
                     /* Si l'adresse n'existe pas, on crée la nouvelle adresse puis on crée ensuite le nouvel véhicule */
                     } else {
+                        console.log(req.body)
                         newBrand(req)
                         .then(result => {
                             newCar(result.id, req, res);
@@ -187,7 +188,7 @@ exports.getCar = async (req, res) => {
 
 // Middleware pour afficher la page "Modifier un véhicule"
 exports.modifyCar = async (req, res) => {
-    const detailsCar = res.locals.detailsCar;
+    const detailsCar = res.locals.detailsCar ? res.locals.detailsCar : null;
     
     const successUpdateCar = req.session.successUpdateCar
     ? req.session.successUpdateCar : null;
@@ -208,11 +209,11 @@ exports.updateCar = async (req, res) => {
             // S'il existe on vérifie si la marque existe
             findBrand(req).then(brand => {
                 // Si la marque existe déjà, on met directement à jour le véhicule
-                if(brand) { refreshCar(brand._id, req, res, car); }
+                if(brand) { refreshCar(brand._id, req, res); }
                 else { 
                 // Si la marque n'existe pas, on crée la marque puis on met à jour le véhicule
                     newBrand(req).then(newBrand => {
-                    refreshCar(newBrand.id, req, res, car);
+                    refreshCar(newBrand.id, req, res);
                 })}
             }).catch(error => {
                 res.status(404).json({message: 'Erreur recherche marque : ' + error.message});
@@ -237,20 +238,19 @@ exports.removeCar = async (req, res) => {
 exports.deleteCar = async (req, res) => {
     try{
         // On vérifie le véhicule existe
-        await findCarById(req.params.id).then(car => {
+        const car = await Car.findOne({_id: req.params.id}).populate('brand');
             // S'il n'existe pas on retourne un message d'erreur
-            if(!car) {res.status(404).send('Car not found');}
-            else {
-                // S'il existe on utilise la méthode deleteOne pour le supprimer en fonction de son identifiant qu'on récupère depuis les paramètres de l'url (req.params)
-                car.deleteOne({_id: req.params.id}).then(() => {
-                    // On stocke au niveau de la session un message de succès
-                    req.session.successDeleteCar = `Véhicule ${car.brand} ${car.model} supprimé avec succès.`;
-                    // On redirige vers la liste des véhicules pour voir le message apparaître
-                    res.redirect(`/cars`);
-                }).catch(error => res.status(400).send('Error Delete Car ' + error.message))
-            }
-        }).catch(error =>
-            res.status(400).send('Error Find Car ' + error.message)
-        )
+        if(!car) {res.status(404).send('Car not found');}
+        else {
+            // S'il existe on utilise la méthode deleteOne pour le supprimer en fonction de son identifiant qu'on récupère depuis les paramètres de l'url (req.params)
+            car.deleteOne({_id: req.params.id}).then(() => {
+            
+                // On stocke au niveau de la session un message de succès
+                req.session.successDeleteCar = `Véhicule ${car.brand.company} ${car.model} supprimé avec succès.`;
+            
+                // On redirige vers la liste des véhicules pour voir le message apparaître
+                res.redirect(`/cars`);
+            }).catch(error => res.status(400).send('Error Delete Car ' + error.message))
+        }    
     } catch(error) {res.status(404).send('Error delete' + error.message);}
 }
