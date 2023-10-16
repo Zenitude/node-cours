@@ -6,6 +6,11 @@ const path = require('path');
 // J'importe les middlewares dont j'ai besoin
 const verifInputsCar = require('../middlewares/verifInputsCar');
 
+// Fonction pour trouver un véhicule selon son id
+const findCarById = async (id) => {
+    return await Car.findOne({_id: id});
+}
+
 // Fonction pour trouver un véhicule selon son immatriculation
 const findCarByImmat = async (req) => {
     return await Car.findOne({immat: req.body.immat});
@@ -68,7 +73,7 @@ const refreshCar = async (idBrand, req, res) => {
         brand: idBrand
     }
 
-    const brand = Brand.findOne({_id: idBrand});
+    const brand = await Brand.findOne({_id: idBrand});
     
     // On utilise la méthode updateOne de mongoose pour effectuer la mise à jour
     await Car.updateOne({ _id: req.params.id}, {...updatedCar})

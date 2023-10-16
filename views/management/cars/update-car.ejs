@@ -14,11 +14,7 @@
     <form action="/cars/<%= detailsCar._id %>/update?_method=PUT" method="POST">
         <div>
             <label for="brand">Marque</label>
-<<<<<<< HEAD
             <input type="text" id="brand" name="brand" value="<%= detailsCar ? detailsCar.brand.company : "" %>"> 
-=======
-            <input type="text" id="brand" name="brand" value="<%= detailsCar && detailsCar.brand ? detailsCar.brand.company : "" %>"> 
->>>>>>> f216c6cb324324ad16f95621a97a894537cb76f0
          </div>
          <div>
              <label for="model">Modèle</label>
